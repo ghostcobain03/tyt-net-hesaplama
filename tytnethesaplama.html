@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TYT Net Hesaplama</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+  --bg:#f5f7ff;
+  --card:#ffffff;
+  --text:#222;
+  --primary:#4facfe;
+}
+
+.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#fff;
+}
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:var(--bg);
+  color:var(--text);
+  text-align:center;
+}
+
+.container{
+  max-width:450px;
+  margin:20px auto;
+  padding:20px;
+}
+
+.card{
+  background:var(--card);
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+input{
+  width:60px;
+  padding:6px;
+  margin:4px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  text-align:center;
+}
+
+button{
+  padding:10px 15px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.toggle{
+  cursor:pointer;
+  font-size:20px;
+}
+
+.small{
+  font-size:13px;
+  opacity:0.7;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topbar">
+<h2>Net Hesaplama</h2>
+<div class="toggle" onclick="tema()">🌙</div>
+</div>
+
+<div class="card">
+
+<p>Türkçe</p>
+<input id="t_d" placeholder="D">
+<input id="t_y" placeholder="Y">
+
+<p>Matematik</p>
+<input id="m_d" placeholder="D">
+<input id="m_y" placeholder="Y">
+
+<p>Fen</p>
+<input id="f_d" placeholder="D">
+<input id="f_y" placeholder="Y">
+
+<p>Sosyal</p>
+<input id="s_d" placeholder="D">
+<input id="s_y" placeholder="Y">
+
+<button onclick="hesapla()">Hesapla</button>
+<button onclick="kaydet()">Kaydet</button>
+
+</div>
+
+<div class="card" id="sonuc">Sonuç bekleniyor...</div>
+
+<div class="card">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="card">
+<h3>Geçmiş Sonuçlar</h3>
+<div id="history" class="small">Henüz kayıt yok</div>
+</div>
+
+</div>
+
+<script>
+
+let chart;
+
+function net(d,y){
+return d - (y/4);
+}
+
+function hesapla(){
+
+let t = net(+t_d.value,+t_y.value);
+let m = net(+m_d.value,+m_y.value);
+let f = net(+f_d.value,+f_y.value);
+let s = net(+s_d.value,+s_y.value);
+
+let total = t+m+f+s;
+
+document.getElementById("sonuc").innerHTML =
+"Toplam Net: " + total.toFixed(2);
+
+grafik(t,m,f,s);
+}
+
+function grafik(t,m,f,s){
+
+if(chart) chart.destroy();
+
+chart = new Chart(document.getElementById("chart"),{
+type:"bar",
+data:{
+labels:["Türkçe","Mat","Fen","Sosyal"],
+datasets:[{
+data:[t,m,f,s],
+backgroundColor:"#4facfe"
+}]
+}
+});
+}
+
+function kaydet(){
+
+let data = document.getElementById("sonuc").innerText;
+let old = localStorage.getItem("history") || "";
+
+localStorage.setItem("history", data + "<br>" + old);
+
+document.getElementById("history").innerHTML =
+localStorage.getItem("history");
+}
+
+// load history
+document.getElementById("history").innerHTML =
+localStorage.getItem("history") || "Henüz kayıt yok";
+
+// dark mode
+function tema(){
+document.body.classList.toggle("dark");
+}
+
+</script>
+
+</body>
+</html>
